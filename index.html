@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=no"
+    />
+    <title>Multiplication Trainer</title>
+    <link
+      rel="stylesheet"
+      href="style.css"
+    />
+    <style>
+      button,
+      input {
+        touch-action: manipulation;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <div id="intro">
+        <h1 data-i18n="title">Multiplication Trainer</h1>
+        <label
+          for="lang"
+          data-i18n="language"
+          >Language:</label
+        >
+        <select id="lang">
+          <option value="en">English</option>
+          <option value="sv">Svenska</option>
+        </select>
+        <button
+          id="startBtn"
+          data-i18n="start"
+        >
+          Start
+        </button>
+      </div>
+
+      <div
+        id="quiz"
+        style="display: none"
+      >
+        <div id="progress"></div>
+        <div
+          id="question"
+          class="question"
+        ></div>
+        <input
+          id="answer"
+          type="number"
+          inputmode="numeric"
+        />
+        <button
+          id="submitBtn"
+          data-i18n="submit"
+        >
+          Submit
+        </button>
+      </div>
+
+      <div
+        id="result"
+        style="display: none"
+      >
+        <p id="summary"></p>
+        <button
+          id="restartBtn"
+          data-i18n="restart"
+        >
+          Restart
+        </button>
+        <h2 data-i18n="leaderboard">Leaderboard</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th data-i18n="correct">Correct</th>
+              <th data-i18n="time">Time (s)</th>
+            </tr>
+          </thead>
+          <tbody id="leaderboardBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <canvas id="confettiCanvas"></canvas>
+    <script src="script.js"></script>
+  </body>
+</html>

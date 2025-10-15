@@ -1,0 +1,12 @@
+{
+  "title": "Multiplikationsträning",
+  "language": "Språk:",
+  "start": "Starta",
+  "submit": "Svara",
+  "restart": "Spela igen",
+  "leaderboard": "Topplista",
+  "correct": "Rätt",
+  "time": "Tid (s)",
+  "question": "Fråga",
+  "summary": "Du fick {correct}/{total} rätt på {time} sekunder!"
+}

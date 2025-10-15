@@ -1,0 +1,12 @@
+{
+  "title": "Multiplication Trainer",
+  "language": "Language:",
+  "start": "Start",
+  "submit": "Submit",
+  "restart": "Restart",
+  "leaderboard": "Leaderboard",
+  "correct": "Correct",
+  "time": "Time (s)",
+  "question": "Question",
+  "summary": "You got {correct}/{total} correct in {time} seconds!"
+}
