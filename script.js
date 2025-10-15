@@ -18,7 +18,6 @@ const resultEl = document.getElementById('result');
 const summaryEl = document.getElementById('summary');
 const restartBtn = document.getElementById('restartBtn');
 const leaderboardBody = document.getElementById('leaderboardBody');
-const langSelect = document.getElementById('lang');
 const confettiCanvas = document.getElementById('confettiCanvas');
 const ctx = confettiCanvas.getContext('2d');
 
@@ -31,19 +30,6 @@ function resizeCanvas() {
 }
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
-
-async function loadTranslations(lang) {
-  try {
-    const res = await fetch(`i18n/${lang}.json`);
-    translations = await res.json();
-    document.querySelectorAll('[data-i18n]').forEach((el) => {
-      const key = el.getAttribute('data-i18n');
-      if (translations[key]) el.textContent = translations[key];
-    });
-  } catch (e) {
-    console.error('Translation load failed:', e);
-  }
-}
 
 function getRandomQuestion() {
   const a = Math.floor(Math.random() * 10) + 1;
@@ -171,56 +157,11 @@ restartBtn.addEventListener('click', startGame);
 answerEl.addEventListener('keydown', (e) => {
   if (e.key === 'Enter') submitAnswer();
 });
-langSelect.addEventListener('change', async (e) => {
-  currentLang = e.target.value;
-  await loadTranslations(currentLang);
-});
 
 // Init
 (async function init() {
-  await loadTranslations(currentLang);
   renderLeaderboard();
 })();
-
-// --- Language handling --- //
-const supportedLanguages = ['sv', 'en'];
-const defaultLanguage = 'sv';
-
-// Hämta språk från localStorage eller sätt default
-function getCurrentLanguage() {
-  const storedLang = localStorage.getItem('language');
-  if (storedLang && supportedLanguages.includes(storedLang)) {
-    return storedLang;
-  }
-  localStorage.setItem('language', defaultLanguage);
-  return defaultLanguage;
-}
-
-function setLanguage(lang) {
-  if (!supportedLanguages.includes(lang)) return;
-  localStorage.setItem('language', lang);
-  applyLanguage(lang);
-}
-
-// Funktion som uppdaterar textinnehåll på sidan
-function applyLanguage(lang) {
-  const texts = {
-    sv: {
-      title: 'Välkommen!',
-      question: 'Vad blir 5 + 3?',
-      button: 'Skicka',
-    },
-    en: {
-      title: 'Welcome!',
-      question: 'What is 5 + 3?',
-      button: 'Submit',
-    },
-  };
-
-  document.querySelector('#title').textContent = texts[lang].title;
-  document.querySelector('.question').textContent = texts[lang].question;
-  document.querySelector('button').textContent = texts[lang].button;
-}
 
 // Kör vid sidladdning
 document.addEventListener('DOMContentLoaded', () => {

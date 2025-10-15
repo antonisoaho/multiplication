@@ -21,21 +21,12 @@
   <body>
     <div id="app">
       <div id="intro">
-        <h1 data-i18n="title">Multiplication Trainer</h1>
-        <label
-          for="lang"
-          data-i18n="language"
-          >Language:</label
-        >
-        <select id="lang">
-          <option value="en">English</option>
-          <option value="sv">Svenska</option>
-        </select>
+        <h1 data-i18n="title">Multiplicera mera!</h1>
         <button
           id="startBtn"
           data-i18n="start"
         >
-          Start
+          Börja
         </button>
       </div>
 
@@ -91,15 +82,15 @@
           id="restartBtn"
           data-i18n="restart"
         >
-          Restart
+          Kör igen
         </button>
-        <h2 data-i18n="leaderboard">Leaderboard</h2>
+        <h2 data-i18n="leaderboard">Topplista</h2>
         <table>
           <thead>
             <tr>
               <th>#</th>
-              <th data-i18n="correct">Correct</th>
-              <th data-i18n="time">Time (s)</th>
+              <th data-i18n="correct">Rätt</th>
+              <th data-i18n="time">Tid (s)</th>
             </tr>
           </thead>
           <tbody id="leaderboardBody"></tbody>
