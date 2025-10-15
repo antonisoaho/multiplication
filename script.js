@@ -167,7 +167,6 @@ function stopConfetti() {
 
 // Events
 startBtn.addEventListener('click', startGame);
-submitBtn.addEventListener('click', submitAnswer);
 restartBtn.addEventListener('click', startGame);
 answerEl.addEventListener('keydown', (e) => {
   if (e.key === 'Enter') submitAnswer();
@@ -233,3 +232,20 @@ document.addEventListener('DOMContentLoaded', () => {
     btn.addEventListener('click', () => setLanguage(btn.dataset.lang));
   });
 });
+
+// NumPad event
+document.querySelectorAll('.numBtn').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    answerEl.value += btn.textContent;
+    answerEl.focus();
+  });
+});
+
+// Clear-knapp
+document.getElementById('clearBtn').addEventListener('click', () => {
+  answerEl.value = '';
+  answerEl.focus();
+});
+
+// Submit-knapp (flyttad)
+document.getElementById('submitBtn').addEventListener('click', submitAnswer);
