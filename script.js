@@ -53,7 +53,6 @@ function showQuestion() {
   questionEl.textContent = `${q.a} × ${q.b} = ?`;
   progressEl.textContent = `${translations['question'] || 'Question'} ${current + 1}/${TOTAL_QUESTIONS}`;
   answerEl.value = '';
-  answerEl.focus();
   questionEl.style.animation = 'none';
 }
 
@@ -167,14 +166,12 @@ answerEl.addEventListener('keydown', (e) => {
 document.querySelectorAll('.numBtn').forEach((btn) => {
   btn.addEventListener('click', () => {
     answerEl.value += btn.textContent;
-    answerEl.focus();
   });
 });
 
 // Clear-knapp
 document.getElementById('clearBtn').addEventListener('click', () => {
   answerEl.value = '';
-  answerEl.focus();
 });
 
 // Submit-knapp (flyttad)
