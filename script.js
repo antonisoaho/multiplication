@@ -21,7 +21,6 @@ const leaderboardBody = document.getElementById('leaderboardBody');
 const langSelect = document.getElementById('lang');
 const confettiCanvas = document.getElementById('confettiCanvas');
 const ctx = confettiCanvas.getContext('2d');
-const confettiBtn = document.getElementById('confetti');
 
 // Confetti
 let confettiPieces = [];
@@ -167,9 +166,6 @@ function stopConfetti() {
 }
 
 // Events
-confettiBtn.addEventListener('click', () => {
-  if (!confettiActive) startConfetti();
-});
 startBtn.addEventListener('click', startGame);
 submitBtn.addEventListener('click', submitAnswer);
 restartBtn.addEventListener('click', startGame);
@@ -186,3 +182,54 @@ langSelect.addEventListener('change', async (e) => {
   await loadTranslations(currentLang);
   renderLeaderboard();
 })();
+
+// --- Language handling --- //
+const supportedLanguages = ['sv', 'en'];
+const defaultLanguage = 'sv';
+
+// Hämta språk från localStorage eller sätt default
+function getCurrentLanguage() {
+  const storedLang = localStorage.getItem('language');
+  if (storedLang && supportedLanguages.includes(storedLang)) {
+    return storedLang;
+  }
+  localStorage.setItem('language', defaultLanguage);
+  return defaultLanguage;
+}
+
+function setLanguage(lang) {
+  if (!supportedLanguages.includes(lang)) return;
+  localStorage.setItem('language', lang);
+  applyLanguage(lang);
+}
+
+// Funktion som uppdaterar textinnehåll på sidan
+function applyLanguage(lang) {
+  const texts = {
+    sv: {
+      title: 'Välkommen!',
+      question: 'Vad blir 5 + 3?',
+      button: 'Skicka',
+    },
+    en: {
+      title: 'Welcome!',
+      question: 'What is 5 + 3?',
+      button: 'Submit',
+    },
+  };
+
+  document.querySelector('#title').textContent = texts[lang].title;
+  document.querySelector('.question').textContent = texts[lang].question;
+  document.querySelector('button').textContent = texts[lang].button;
+}
+
+// Kör vid sidladdning
+document.addEventListener('DOMContentLoaded', () => {
+  const lang = getCurrentLanguage();
+  applyLanguage(lang);
+
+  // Koppla event till språkknappar om de finns
+  document.querySelectorAll('[data-lang]').forEach((btn) => {
+    btn.addEventListener('click', () => setLanguage(btn.dataset.lang));
+  });
+});

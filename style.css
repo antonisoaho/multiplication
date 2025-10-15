@@ -1,7 +1,7 @@
 body {
   font-family: system-ui, sans-serif;
   background: linear-gradient(325deg, #21fb5b, #acb6e5);
-  height: 100vh;
+  height: 100dvh;
   width: 100vw;
 }
 
@@ -21,7 +21,8 @@ body {
   background: rgba(255, 255, 255, 0.2);
   padding: 2rem;
   border-radius: 16px;
-  width: 420px;
+  width: 100%;
+  max-width: 420px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
   text-align: center;
 }
@@ -104,6 +105,7 @@ table th {
   #app {
     padding: 1rem;
     border-radius: 12px;
+    max-width: 100%;
   }
   .question {
     font-size: 1.5rem;
