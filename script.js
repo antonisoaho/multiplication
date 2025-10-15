@@ -163,17 +163,6 @@ answerEl.addEventListener('keydown', (e) => {
   renderLeaderboard();
 })();
 
-// Kör vid sidladdning
-document.addEventListener('DOMContentLoaded', () => {
-  const lang = getCurrentLanguage();
-  applyLanguage(lang);
-
-  // Koppla event till språkknappar om de finns
-  document.querySelectorAll('[data-lang]').forEach((btn) => {
-    btn.addEventListener('click', () => setLanguage(btn.dataset.lang));
-  });
-});
-
 // NumPad event
 document.querySelectorAll('.numBtn').forEach((btn) => {
   btn.addEventListener('click', () => {

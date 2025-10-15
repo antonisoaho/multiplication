@@ -41,6 +41,36 @@ button:hover {
   background: #4338ca;
 }
 
+#startBtn {
+  background: linear-gradient(270deg, #ff0000, #ff9900, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000);
+  background-size: 1600% 1600%;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 1rem 2rem;
+  font-size: 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s;
+  animation: rainbowBG 8s ease infinite;
+}
+
+#startBtn:hover {
+  transform: scale(1.05);
+}
+
+@keyframes rainbowBG {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
 input[type='number'] {
   width: 10ch;
   font-size: 2.5rem;
