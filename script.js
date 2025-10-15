@@ -164,15 +164,21 @@ answerEl.addEventListener('keydown', (e) => {
 
 // NumPad event
 document.querySelectorAll('.numBtn').forEach((btn) => {
-  btn.addEventListener('click', () => {
+  btn.addEventListener('click', (e) => {
+    e.preventDefault();
     answerEl.value += btn.textContent;
   });
 });
 
 // Clear-knapp
-document.getElementById('clearBtn').addEventListener('click', () => {
+document.getElementById('clearBtn').addEventListener('click', (e) => {
+  e.preventDefault();
   answerEl.value = '';
 });
 
 // Submit-knapp (flyttad)
-document.getElementById('submitBtn').addEventListener('click', submitAnswer);
+document.getElementById('submitBtn').addEventListener('click', (e) => {
+  e.preventDefault();
+  submitAnswer();
+  questionEl.focus();
+});
