@@ -3,33 +3,35 @@ let questions = [];
 let current = 0;
 let correct = 0;
 let startTime = null;
-let translations = {};
+let translations = {}; // optional: can be filled from external i18n
 let currentLang = 'en';
 
-// DOM refs
-const startBtn = document.getElementById('startBtn');
-const quizEl = document.getElementById('quiz');
-const introEl = document.getElementById('intro');
-const questionEl = document.getElementById('question');
-const answerEl = document.getElementById('answer');
-const submitBtn = document.getElementById('submitBtn');
-const progressEl = document.getElementById('progress');
-const resultEl = document.getElementById('result');
-const summaryEl = document.getElementById('summary');
-const restartBtn = document.getElementById('restartBtn');
-const leaderboardBody = document.getElementById('leaderboardBody');
-const confettiCanvas = document.getElementById('confettiCanvas');
-const ctx = confettiCanvas.getContext('2d');
+// DOM refs (assigned on DOMContentLoaded)
+let startBtn,
+  quizEl,
+  introEl,
+  questionEl,
+  answerEl,
+  submitBtn,
+  progressEl,
+  resultEl,
+  summaryEl,
+  restartBtn,
+  leaderboardBody,
+  confettiCanvas,
+  ctx;
 
 // Confetti
 let confettiPieces = [];
 let confettiActive = false;
+let confettiRafId = null;
+
 function resizeCanvas() {
+  if (!confettiCanvas) return;
   confettiCanvas.width = window.innerWidth;
   confettiCanvas.height = window.innerHeight;
 }
 window.addEventListener('resize', resizeCanvas);
-resizeCanvas();
 
 function getRandomQuestion() {
   const a = Math.floor(Math.random() * 10) + 1;
@@ -42,28 +44,35 @@ function startGame() {
   current = 0;
   correct = 0;
   startTime = Date.now();
-  introEl.style.display = 'none';
-  resultEl.style.display = 'none';
-  quizEl.style.display = 'block';
+  if (introEl) introEl.style.display = 'none';
+  if (resultEl) resultEl.style.display = 'none';
+  if (quizEl) quizEl.style.display = 'block';
   showQuestion();
 }
 
 function showQuestion() {
   const q = questions[current];
-  questionEl.textContent = `${q.a} × ${q.b} = ?`;
-  progressEl.textContent = `${translations['question'] || 'Question'} ${current + 1}/${TOTAL_QUESTIONS}`;
-  answerEl.value = '';
-  questionEl.style.animation = 'none';
+  const qText = q ? `${q.a} × ${q.b} = ?` : '';
+  if (questionEl) {
+    questionEl.textContent = qText;
+    questionEl.style.animation = 'none';
+  }
+  if (progressEl) {
+    const qLabel = (translations && translations['question']) || 'Question';
+    progressEl.textContent = `${qLabel} ${current + 1}/${TOTAL_QUESTIONS}`;
+  }
+  if (answerEl) answerEl.value = '';
 }
 
 function submitAnswer() {
   const q = questions[current];
-  const val = parseInt(answerEl.value, 10);
-  if (val === q.answer) {
+  if (!q) return;
+  const val = parseInt(answerEl?.value || '', 10);
+  if (!Number.isNaN(val) && val === q.answer) {
     correct++;
-    questionEl.style.animation = 'popCorrect 0.4s ease';
+    if (questionEl) questionEl.style.animation = 'popCorrect 0.4s ease';
   } else {
-    questionEl.style.animation = 'popWrong 0.4s ease';
+    if (questionEl) questionEl.style.animation = 'popWrong 0.4s ease';
   }
 
   setTimeout(() => {
@@ -75,12 +84,16 @@ function submitAnswer() {
 
 function endGame() {
   const totalTime = ((Date.now() - startTime) / 1000).toFixed(2);
-  quizEl.style.display = 'none';
-  resultEl.style.display = 'block';
-  summaryEl.textContent = translations['summary']
-    .replace('{correct}', correct)
-    .replace('{total}', TOTAL_QUESTIONS)
-    .replace('{time}', totalTime);
+  if (quizEl) quizEl.style.display = 'none';
+  if (resultEl) resultEl.style.display = 'block';
+
+  const tpl = (translations && translations['summary']) || '{correct}/{total} in {time}s';
+  if (summaryEl) {
+    summaryEl.textContent = tpl
+      .replace('{correct}', String(correct))
+      .replace('{total}', String(TOTAL_QUESTIONS))
+      .replace('{time}', String(totalTime));
+  }
 
   saveResult(correct, totalTime);
   renderLeaderboard();
@@ -91,14 +104,20 @@ function endGame() {
   }
 }
 
-function saveResult(correct, time) {
-  const results = JSON.parse(localStorage.getItem('multiplicationResults') || '[]');
-  results.push({ correct, time: parseFloat(time) });
-  results.sort((a, b) => b.correct - a.correct || a.time - b.time);
-  localStorage.setItem('multiplicationResults', JSON.stringify(results.slice(0, 10)));
+function saveResult(correctCount, time) {
+  try {
+    const results = JSON.parse(localStorage.getItem('multiplicationResults') || '[]');
+    results.push({ correct: correctCount, time: parseFloat(time) });
+    results.sort((a, b) => b.correct - a.correct || a.time - b.time);
+    localStorage.setItem('multiplicationResults', JSON.stringify(results.slice(0, 10)));
+  } catch (e) {
+    // ignore storage errors
+    console.error('Failed to save result', e);
+  }
 }
 
 function renderLeaderboard() {
+  if (!leaderboardBody) return;
   const results = JSON.parse(localStorage.getItem('multiplicationResults') || '[]');
   leaderboardBody.innerHTML = '';
   results.forEach((r, i) => {
@@ -110,9 +129,11 @@ function renderLeaderboard() {
 
 // Confetti engine
 function startConfetti() {
+  if (!confettiCanvas || !ctx) return;
+  if (confettiActive) return;
   confettiPieces = Array.from({ length: 120 }, () => ({
     x: Math.random() * window.innerWidth,
-    y: Math.random() * window.innerHeight - window.innerHeight,
+    y: Math.random() * -window.innerHeight,
     r: Math.random() * 6 + 4,
     d: Math.random() * 0.5 + 0.5,
     color: `hsl(${Math.random() * 360}, 100%, 50%)`,
@@ -122,7 +143,7 @@ function startConfetti() {
 }
 
 function drawConfetti() {
-  if (!confettiActive) return;
+  if (!confettiActive || !ctx || !confettiCanvas) return;
   ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
   confettiPieces.forEach((p) => {
     ctx.beginPath();
@@ -131,7 +152,7 @@ function drawConfetti() {
     ctx.fill();
   });
   updateConfetti();
-  requestAnimationFrame(drawConfetti);
+  confettiRafId = requestAnimationFrame(drawConfetti);
 }
 
 function updateConfetti() {
@@ -147,38 +168,61 @@ function updateConfetti() {
 
 function stopConfetti() {
   confettiActive = false;
-  ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+  if (confettiRafId) {
+    cancelAnimationFrame(confettiRafId);
+    confettiRafId = null;
+  }
+  if (ctx && confettiCanvas) ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
 }
 
-// Events
-startBtn.addEventListener('click', startGame);
-restartBtn.addEventListener('click', startGame);
-answerEl.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') submitAnswer();
-});
+// Wire up DOM and events after load
+document.addEventListener('DOMContentLoaded', () => {
+  startBtn = document.getElementById('startBtn');
+  quizEl = document.getElementById('quiz');
+  introEl = document.getElementById('intro');
+  questionEl = document.getElementById('question');
+  answerEl = document.getElementById('answer');
+  submitBtn = document.getElementById('submitBtn');
+  progressEl = document.getElementById('progress');
+  resultEl = document.getElementById('result');
+  summaryEl = document.getElementById('summary');
+  restartBtn = document.getElementById('restartBtn');
+  leaderboardBody = document.getElementById('leaderboardBody');
+  confettiCanvas = document.getElementById('confettiCanvas');
+  ctx = confettiCanvas ? confettiCanvas.getContext('2d') : null;
 
-// Init
-(async function init() {
-  renderLeaderboard();
-})();
+  resizeCanvas();
 
-// NumPad event
-document.querySelectorAll('.numBtn').forEach((btn) => {
-  btn.addEventListener('click', (e) => {
-    e.preventDefault();
-    answerEl.value += btn.textContent;
+  if (startBtn) startBtn.addEventListener('click', startGame);
+  if (restartBtn) restartBtn.addEventListener('click', startGame);
+  if (answerEl) {
+    answerEl.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') submitAnswer();
+    });
+  }
+
+  document.querySelectorAll('.numBtn').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (answerEl) answerEl.value += btn.textContent;
+    });
   });
-});
 
-// Clear-knapp
-document.getElementById('clearBtn').addEventListener('click', (e) => {
-  e.preventDefault();
-  answerEl.value = '';
-});
+  const clearBtn = document.getElementById('clearBtn');
+  if (clearBtn) {
+    clearBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (answerEl) answerEl.value = '';
+    });
+  }
 
-// Submit-knapp (flyttad)
-document.getElementById('submitBtn').addEventListener('click', (e) => {
-  e.preventDefault();
-  submitAnswer();
-  questionEl.focus();
+  if (submitBtn) {
+    submitBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      submitAnswer();
+      if (answerEl) answerEl.focus();
+    });
+  }
+
+  renderLeaderboard();
 });
